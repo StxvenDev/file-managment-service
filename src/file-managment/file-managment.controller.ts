@@ -1,35 +1,17 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseInterceptors } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { FileManagmentService } from './file-managment.service';
 import { CreateFileManagmentDto } from './dto/create-file-managment.dto';
-import { UpdateFileManagmentDto } from './dto/update-file-managment.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class FileManagmentController {
   constructor(private readonly fileManagmentService: FileManagmentService) {}
 
-  @MessagePattern('createFileManagment')
-  create(@Payload() createFileManagmentDto: CreateFileManagmentDto) {
-    return this.fileManagmentService.create(createFileManagmentDto);
+  @MessagePattern('upload-files')
+  @UseInterceptors(FilesInterceptor('files', 10))
+  uploadFiles(@Payload() createFileManagmentDto: CreateFileManagmentDto) {
+    return this.fileManagmentService.uploadFile(createFileManagmentDto);
   }
 
-  @MessagePattern('findAllFileManagment')
-  findAll() {
-    return this.fileManagmentService.findAll();
-  }
-
-  @MessagePattern('findOneFileManagment')
-  findOne(@Payload() id: number) {
-    return this.fileManagmentService.findOne(id);
-  }
-
-  @MessagePattern('updateFileManagment')
-  update(@Payload() updateFileManagmentDto: UpdateFileManagmentDto) {
-    return this.fileManagmentService.update(updateFileManagmentDto.id, updateFileManagmentDto);
-  }
-
-  @MessagePattern('removeFileManagment')
-  remove(@Payload() id: number) {
-    return this.fileManagmentService.remove(id);
-  }
 }
