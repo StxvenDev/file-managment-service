@@ -33,13 +33,12 @@ export class BlobStorageService {
   async uploadFile(file: any): Promise<string> {
     const containerClient = this.blobServiceClient.getContainerClient(this.containerName);
     try {
-      const fileId = uuid();
-      const blockBlobClient = containerClient.getBlockBlobClient(fileId);
+      const blockBlobClient = containerClient.getBlockBlobClient(file.name);
       const buffer = Buffer.from(file.content, 'base64');
       await blockBlobClient.uploadData(buffer, {
         blobHTTPHeaders: { blobContentType: file.type },
       });
-      return `${blockBlobClient.url}&${envs.azureToken}`;
+      return `${blockBlobClient.url}?${envs.azureToken}.`;
     } catch (error) {
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
